@@ -1,0 +1,67 @@
+(in-package #:sito/tests)
+
+(defun tests--scores ()
+  "Exercise matching and the order of scores."
+  (test-assert (null (score "xyz" "autolith")) "characters out of order do not match")
+  (test-assert (null (score "ba" "ab")) "the order of the query counts")
+  (test-assert (eql 0 (score "" "anything")) "an empty query matches with zero")
+  (test-assert (score "ALT" "autolith") "case is ignored")
+  (dolist (case '(("frob" "frob" "frobnicate" "an equal string beats a longer one")
+                  ("fb" "foo-bar" "foobar" "a word start beats a letter inside a word")
+                  ("ws" "world/sidebar.lisp" "browser/list.lisp"
+                   "starts after a slash beat letters inside a word")
+                  ("ab" "ab-c" "a-b-c" "consecutive letters beat a gap")
+                  ("fB" "fooBar" "foobar" "a capital after lowercase starts a word")
+                  ("car" "car" "a-very-long-prefix-car" "leading characters cost")))
+    (destructuring-bind (query better worse description) case
+      (test-assert (> (score query better) (score query worse)) description)))
+  (let ((long (make-string (1+ *score-length-limit*) :initial-element #\a)))
+    (test-assert (< (score "aa" long) (score "aa" "bab-a"))
+                 "a string past the limit matches with the lowest score"))
+  nil)
+
+(defun tests--positions ()
+  "Exercise the matched indices."
+  (dolist (case '(("fb" "foo-bar" (0 4))
+                  ("frob" "frob" (0 1 2 3))
+                  ("sl" "src/world/sidebar.lisp" (10 18))
+                  ("" "abc" nil)
+                  ("zz" "abc" nil)))
+    (destructuring-bind (query string expected) case
+      (test-assert (equal (positions query string) expected)
+                   (format nil "~S aligns in ~S" query string))))
+  (let ((long (make-string (1+ *score-length-limit*) :initial-element #\a)))
+    (test-assert (equal (positions "aa" long) '(0 1))
+                 "a string past the limit reports its first matching characters"))
+  nil)
+
+(defun tests--ranking ()
+  "Exercise ranking, words, keys and limits."
+  (let ((items '("src/world/sidebar.lisp" "src/terminal/style.lisp" "docs/guide.org" "sidebar")))
+    (test-assert (equal (rank "sidebar" items) '("sidebar" "src/world/sidebar.lisp"))
+                 "matches come best first and the others are dropped")
+    (test-assert (equal (rank "" items) items) "an empty query keeps every item in order")
+    (test-assert (equal (rank "src lisp" items :limit 1) '("src/world/sidebar.lisp"))
+                 "every word must match and a limit cuts the result")
+    (test-assert (null (rank "src org" items)) "a word nothing has drops the item"))
+  (test-assert (equal (terms "  frob   start ") '("frob" "start")) "words are split at whitespace")
+  (let ((channels '((:name "marta" :title "Windows build")
+                    (:name "otto" :title "marta's review")
+                    (:name nil :title "unrelated"))))
+    (test-assert (equal (mapcar (lambda (channel) (getf channel :name))
+                                (rank "marta" channels
+                                      :key (lambda (channel)
+                                             (list (getf channel :name) (getf channel :title)))))
+                        '("marta" "otto"))
+                 "the best field counts and a missing field is skipped"))
+  (test-assert (equal (rank "a" '("ba" "ca")) '("ba" "ca")) "equal scores keep their order")
+  nil)
+
+(defun run-tests ()
+  "Run every sito regression test."
+  (setf *test-count* 0)
+  (tests--scores)
+  (tests--positions)
+  (tests--ranking)
+  (format t "~&~:D sito tests passed.~%" *test-count*)
+  nil)

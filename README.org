@@ -1,0 +1,54 @@
+#+TITLE: sito
+#+STARTUP: content
+
+=sito= is a fuzzy matcher for short strings: names, titles, paths. A query
+matches a string that contains its characters in order, ignoring case. The
+score follows fzy: runs of characters and matches at the start of a word score
+high, gaps cost a little.
+
+#+BEGIN_SRC lisp
+(sito:score "fb" "foo-bar")
+;; => 1680
+
+(sito:score "xyz" "foo-bar")
+;; => NIL
+
+(sito:positions "fb" "foo-bar")
+;; => (0 4)
+
+(sito:rank "sidebar" '("src/world/sidebar.lisp" "docs/guide.org" "sidebar"))
+;; => ("sidebar" "src/world/sidebar.lisp")
+#+END_SRC
+
+* Ranking
+
+=RANK= returns the items a query matches, best first. Equal scores keep the
+order of the items, so a list that arrives newest first stays that way.
+
+Every word of the query must match. =:KEY= returns the string an item is
+matched by, or a list of strings: each word counts with the field it matches
+best, so one word can match a name and another a path.
+
+#+BEGIN_SRC lisp
+(sito:rank "marta build" channels
+           :key   (lambda (channel)
+                    (list (channel-name channel) (channel-title channel)))
+           :limit 20)
+#+END_SRC
+
+* Limits
+
+A string longer than =*SCORE-LENGTH-LIMIT*= characters is not aligned: it
+matches with the lowest score and reports its first matching characters. The
+work for one string is proportional to its length times the query's.
+
+* Checks
+
+#+BEGIN_SRC sh
+./script/bootstrap
+./script/check
+#+END_SRC
+
+=./script/check= runs the tests, then the source rules of
+[[https://github.com/lambda-symbolics/cheque][cheque]]. =./script/check --fix= repairs what the rules can repair and skips
+the tests.
