@@ -1,5 +1,5 @@
 (asdf:defsystem #:sito
-  :description "A fast fuzzy matcher for short strings: scores, match positions and ranking"
+  :description "A library for fast fuzzy matching for short strings with scores, positions and ranking"
   :author      "Lukáš Hozda"
   :license     "COLL-Attribution"
   :version     "0.1.0"

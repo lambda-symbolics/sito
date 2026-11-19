@@ -1,5 +1,5 @@
 (defpackage #:sito
-  (:documentation "Fuzzy matching of a short query against short strings.")
+  (:documentation "Library for fuzzy matching a short query against short strings.")
   (:use #:cl)
   (:export #:*score-length-limit*
            #:positions
