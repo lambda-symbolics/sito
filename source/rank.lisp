@@ -3,6 +3,7 @@
 ;;;; -- Ranking --
 
 (declaim (ftype (function (string) list) terms))
+
 (defun terms (query)
   "Return QUERY's words, the parts whitespace separates."
   (loop with start = 0
@@ -14,6 +15,7 @@
         do (setf start (1+ end))))
 
 (declaim (ftype (function (list (or string list)) (or null integer)) rank--score))
+
 (defun rank--score (terms fields)
   "Return the sum of each of TERMS' best score over FIELDS, or NIL when one matches none.
 
@@ -30,6 +32,7 @@ FIELDS is a string or a list of strings; a NIL field is skipped."
         (incf total best)))))
 
 (declaim (ftype (function (string list &key (:key function) (:limit (or null (integer 0)))) list) rank))
+
 (defun rank (query items &key (key #'identity) limit)
   "Return the ITEMS that QUERY matches, best first, at most LIMIT of them.
 

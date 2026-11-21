@@ -1,13 +1,6 @@
 (defpackage #:sito/tests
   (:documentation "Regression tests for sito.")
   (:use #:cl)
-    (:import-from #:sito
-                  #:*score-length-limit*
-                  #:match-p
-                  #:positions
-                  #:rank
-                  #:score
-                  #:terms)
   (:export #:run-tests))
 
 (in-package #:sito/tests)

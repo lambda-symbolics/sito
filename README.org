@@ -7,6 +7,9 @@ score follows fzy: runs of characters and matches at the start of a word score
 high, gaps cost a little.
 
 #+BEGIN_SRC lisp
+(sito:match-p "FB" "foo-bar")
+;; => T
+
 (sito:score "fb" "foo-bar")
 ;; => 1680
 
@@ -19,6 +22,8 @@ high, gaps cost a little.
 (sito:rank "sidebar" '("src/world/sidebar.lisp" "docs/guide.org" "sidebar"))
 ;; => ("sidebar" "src/world/sidebar.lisp")
 #+END_SRC
+
+Use =MATCH-P= when you only need to know whether the query matches.
 
 * Ranking
 

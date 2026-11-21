@@ -45,6 +45,7 @@
   "The score of a match after a dot.")
 
 (declaim (ftype (function (simple-string fixnum) fixnum) score--bonus))
+
 (defun score--bonus (string index)
   "Return what a match at INDEX of STRING earns for where it stands."
   (if (zerop index)
@@ -63,6 +64,7 @@
            0)))))
 
 (declaim (ftype (function (simple-string simple-string) boolean) score--subsequence-p))
+
 (defun score--subsequence-p (query string)
   "Return true when STRING contains QUERY's characters in order, ignoring case."
   (let ((start 0))
@@ -74,6 +76,7 @@
           finally (return t))))
 
 (declaim (ftype (function (string string) boolean) match-p))
+
 (defun match-p (query string)
   "Return true when QUERY is a case-insensitive subsequence of STRING."
   (score--subsequence-p (coerce query 'simple-string)
@@ -82,6 +85,7 @@
 (declaim (ftype (function (simple-string simple-string &key (:ending simple-vector) (:best simple-vector))
                           score)
                 score--align))
+
 (defun score--align (query string &key ending best)
   "Return the best alignment score of QUERY in STRING.
 
@@ -125,6 +129,7 @@ without them two rows are kept."
     (aref above-m (1- length))))
 
 (declaim (ftype (function (string string) (or null score)) score))
+
 (defun score (query string)
   "Return how well QUERY matches STRING, or NIL when it does not match.
 
@@ -145,6 +150,7 @@ higher score is a better match; an empty QUERY matches everything with zero."
        (score--align query string)))))
 
 (declaim (ftype (function (string string) list) positions))
+
 (defun positions (query string)
   "Return the indices of STRING the best alignment of QUERY matches, in order, or NIL.
 
