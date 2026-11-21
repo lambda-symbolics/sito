@@ -73,6 +73,12 @@
                (setf start (1+ found)))
           finally (return t))))
 
+(declaim (ftype (function (string string) boolean) match-p))
+(defun match-p (query string)
+  "Return true when QUERY is a case-insensitive subsequence of STRING."
+  (score--subsequence-p (coerce query 'simple-string)
+                        (coerce string 'simple-string)))
+
 (declaim (ftype (function (simple-string simple-string &key (:ending simple-vector) (:best simple-vector))
                           score)
                 score--align))

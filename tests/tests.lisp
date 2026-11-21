@@ -6,6 +6,13 @@
   (test-assert (null (score "ba" "ab")) "the order of the query counts")
   (test-assert (eql 0 (score "" "anything")) "an empty query matches with zero")
   (test-assert (score "ALT" "autolith") "case is ignored")
+    (dolist (case '(("" "anything" t)
+                    ("abc" "a-c-b" nil)
+                    ("acb" "a-c-b" t)
+                    ("GDE" "docs/guide.org" t)))
+      (destructuring-bind (query string expected) case
+        (test-assert (eq (match-p query string) expected)
+                     (format nil "~S matches ~S as expected" query string))))
   (dolist (case '(("frob" "frob" "frobnicate" "an equal string beats a longer one")
                   ("fb" "foo-bar" "foobar" "a word start beats a letter inside a word")
                   ("ws" "world/sidebar.lisp" "browser/list.lisp"
